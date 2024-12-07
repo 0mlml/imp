@@ -1,0 +1,47 @@
+# Frontend Specific (located in /frontend folder)
+
+# Node Modules
+/frontend/node_modules
+
+# Output
+/frontend.output
+/frontend.vercel
+/frontend.netlify
+/frontend.wrangler
+/frontend/.svelte-kit
+/frontend/build
+
+# OS-specific files
+/frontend.DS_Store
+/frontend.Thumbs.db
+
+# Environment files
+/frontend.env
+/frontend.env.*
+/frontend!.env.example
+/frontend!.env.test
+
+# Vite specific
+/frontendvite.config.js.timestamp-*
+/frontendvite.config.ts.timestamp-*
+
+# Middleware Specific (located in /middleware folder)
+
+# Allowlist gitignore template for Go projects prevents us
+# from adding various unwanted local files, such as generated
+# files, developer configurations or IDE-specific files etc.
+
+# But not these files...
+/middleware/.gitignore
+
+/middleware!*.go
+/middleware!go.sum
+/middleware!go.mod
+
+/middleware!README.md
+/middleware!LICENSE
+
+# /middleware!Makefile
+
+# ...even if they are in subdirectories
+/middleware!*/
