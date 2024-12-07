@@ -170,26 +170,28 @@ func main() {
 		fmt.Printf("Debug mode enabled. Generated %d fake sensor data entries.\n", SENSOR_BACKLOG_SIZE)
 		fmt.Println("There will be no serial communication.")
 	} else {
-		sPort := getSerialPort()
-		if sPort == nil {
-			return
-		}
-		fmt.Println("Successfully connected to WM1110!")
+		go func() {
+			sPort := getSerialPort()
+			if sPort == nil {
+				return
+			}
+			fmt.Println("Successfully connected to WM1110!")
 
-		serialMgr := NewSerialManager(sPort)
-		serialMgr.StartReadLoop()
+			serialMgr := NewSerialManager(sPort)
+			serialMgr.StartReadLoop()
 
-		startConsoleInput(serialMgr)
+			startConsoleInput(serialMgr)
 
-		fmt.Println("Serial communication started. Type your messages and press Enter to send.")
-		fmt.Println("Press Ctrl+C to exit.")
+			fmt.Println("Serial communication started. Type your messages and press Enter to send.")
+			fmt.Println("Press Ctrl+C to exit.")
 
-		sigChan := make(chan os.Signal, 1)
-		signal.Notify(sigChan, os.Interrupt)
+			sigChan := make(chan os.Signal, 1)
+			signal.Notify(sigChan, os.Interrupt)
 
-		<-sigChan
-		fmt.Println("\nShutting down...")
-		serialMgr.Stop()
+			<-sigChan
+			fmt.Println("\nShutting down...")
+			serialMgr.Stop()
+		}()
 	}
 
 	startHttpServer()

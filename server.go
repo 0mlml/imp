@@ -21,6 +21,9 @@ func startHttpServer() {
 			count = 1
 		}
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.Write([]byte("["))
 		for i := 0; i < count; i++ {
 			if i != 0 {
