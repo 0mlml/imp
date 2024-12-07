@@ -4,7 +4,7 @@ export const DATA_STATE_LOADING = 2;
 export const DATA_STATE_IN_MOUTH = 3;
 export const DATA_STATE_OUT_MOUTH = 4;
 
-export const THRESHOLD_TEMP_IN_MOUTH = 27;  // Temperature in °C for the mouth
+export const THRESHOLD_TEMP_IN_MOUTH = 25;  // Temperature in °C for the mouth
 export const THRESHOLD_TEMP_DIFFERENCE = 2; // Maximum allowed difference between environmental and mouth temperature
 export const THRESHOLD_HUMIDITY_IN_MOUTH = 80; // Humidity in % for the mouth
 export const THRESHOLD_HUMIDITY_DIFFERENCE = 20; // Maximum allowed difference between environmental and mouth humidity

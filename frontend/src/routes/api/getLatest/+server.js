@@ -1,9 +1,9 @@
 import { GRAVITY_ACCEL, HUM_MAX_DELTA, TEMP_DIFFERENCE, TEMP_MAX_DELTA, THRESHOLD_ACCEL, THRESHOLD_HUMIDITY_DIFFERENCE, THRESHOLD_HUMIDITY_IN_MOUTH, THRESHOLD_STILL_PERIOD, THRESHOLD_STRICT_ACCEL, THRESHOLD_TEMP_DIFFERENCE, THRESHOLD_TEMP_IN_MOUTH } from "$lib/consts";
 
-export async function GET() {
+export async function POST({ request }) {
+    const { environmentalTemperature, environmentalHumidity } = await request.json();
     const data = await (await fetch(`http://localhost:8080/getlatest?count=100`)).json();
 
-    const { environmentalTemperature, environmentalHumidity } = getEnvironmentalData(data);
     const { humidity, temperature } = data[0].humidity;
     const { x, y, z, peak_acceleration } = data[0].accelerometer;
 
@@ -29,62 +29,6 @@ function humidityInMouth(humidity, environmentalHumidity) {
     return (aboveThreshold ? 5 : -0.5) + (Math.abs(diff) > THRESHOLD_HUMIDITY_DIFFERENCE ? 0.5 : 0) + (diff < 0 ? -0.5 : 0.5) > 1;
 }
 
-let lastEnvironmentalData = { environmentalTemperature: null, environmentalHumidity: null };
-
-function getEnvironmentalData(data) {
-    const stablePeriods = findStablePeriods(data);
-    if (!stablePeriods.length) {
-        if (!lastEnvironmentalData.environmentalTemperature) {
-            lastEnvironmentalData = {
-                environmentalTemperature: THRESHOLD_TEMP_IN_MOUTH - TEMP_MAX_DELTA,
-                environmentalHumidity: THRESHOLD_HUMIDITY_IN_MOUTH - HUM_MAX_DELTA
-            };
-        }
-        return lastEnvironmentalData;
-    }
-
-    const newReadings = calculateEnvironmentalReadings(stablePeriods[0]);
-    return updateEnvironmentalData(newReadings);
-}
-
-function findStablePeriods(data) {
-    const periods = [];
-    let currentPeriod = [];
-    let currentFails = 0;
-
-    for (let i = 1; i < data.length; i++) {
-        const isStable = isReadingStable(data[i], data[i - 1]);
-        
-        if (currentPeriod.length >= THRESHOLD_STILL_PERIOD) {
-            periods.push([...currentPeriod]);
-            currentPeriod = [];
-            currentFails = 0;
-        }
-        if (isStable) {
-            currentPeriod.push(data[i]);
-        } else if (currentFails < THRESHOLD_STILL_PERIOD * 0.8) {
-            currentFails++;
-        } else {
-            currentPeriod = [];
-            currentFails = 0;
-        } 
-    }
-
-    if (currentPeriod.length >= THRESHOLD_STILL_PERIOD) {
-        periods.push(currentPeriod);
-    }
-
-    return periods.sort((a, b) => b.length - a.length);
-}
-
-function isReadingStable(current, previous) {
-    const accelDelta = Math.abs(current.accelerometer.peak_acceleration - previous.accelerometer.peak_acceleration);
-    const tempDelta = Math.abs(current.humidity.temperature - previous.humidity.temperature);
-    const humDelta = Math.abs(current.humidity.humidity - previous.humidity.humidity);
-    const deltasCheck = tempDelta <= TEMP_MAX_DELTA && humDelta <= HUM_MAX_DELTA;
-    return accelDelta <= THRESHOLD_STRICT_ACCEL && (tempDelta && humDelta && deltasCheck); 
-}
-
 function calculateEnvironmentalReadings(period) {
     const temps = period.map(r => r.humidity.temperature);
     const hums = period.map(r => r.humidity.humidity);
@@ -99,20 +43,6 @@ function median(values) {
     const sorted = [...values].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-function updateEnvironmentalData(newReadings) {
-    if (!lastEnvironmentalData.environmentalTemperature) {
-        lastEnvironmentalData = newReadings;
-        return newReadings;
-    }
-
-    lastEnvironmentalData = {
-        environmentalTemperature: smoothValue(lastEnvironmentalData.environmentalTemperature, newReadings.environmentalTemperature),
-        environmentalHumidity: smoothValue(lastEnvironmentalData.environmentalHumidity, newReadings.environmentalHumidity)
-    };
-
-    return lastEnvironmentalData;
 }
 
 function smoothValue(last, current) {
