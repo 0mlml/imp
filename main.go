@@ -150,7 +150,6 @@ func getSerialPort() serial.Port {
 		fmt.Printf("Failed to open serial connection: %v\n", err)
 		return nil
 	}
-	defer sPort.Close()
 
 	sPort.SetMode(&serial.Mode{
 		BaudRate: 115200,
@@ -172,8 +171,9 @@ func main() {
 	} else {
 		go func() {
 			sPort := getSerialPort()
+			defer sPort.Close()
 			if sPort == nil {
-				return
+				panic("Failed to get serial port")
 			}
 			fmt.Println("Successfully connected to WM1110!")
 
