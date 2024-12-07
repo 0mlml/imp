@@ -2,78 +2,17 @@ package main
 
 import (
 	"bufio"
-	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
+	"math/rand"
 	"os"
 	"os/signal"
 	"strings"
-	"sync"
-	"syscall"
-	"time"
 
 	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
 )
-
-type SerialManager struct {
-	port     serial.Port
-	stopChan chan struct{}
-	wg       sync.WaitGroup
-}
-
-func NewSerialManager(port serial.Port) *SerialManager {
-	return &SerialManager{
-		port:     port,
-		stopChan: make(chan struct{}),
-	}
-}
-
-func (sm *SerialManager) StartReadLoop() {
-	sm.wg.Add(1)
-	go func() {
-		defer sm.wg.Done()
-
-		reader := bufio.NewReader(sm.port)
-
-		for {
-			select {
-			case <-sm.stopChan:
-				return
-			default:
-				line, err := reader.ReadString('\n')
-				if err != nil {
-					if err != io.EOF && err != syscall.ETIMEDOUT {
-						fmt.Printf("Read error: %v\n", err)
-					}
-					time.Sleep(10 * time.Millisecond)
-					continue
-				}
-
-				line = string(bytes.ReplaceAll([]byte(line), []byte("\r"), []byte("")))
-				fmt.Print(line)
-			}
-		}
-	}()
-}
-
-func (sm *SerialManager) WriteData(data []byte) error {
-	if !bytes.HasSuffix(data, []byte("\n")) {
-		data = append(data, '\n')
-	}
-
-	_, err := sm.port.Write(data)
-	if err != nil {
-		return fmt.Errorf("write error: %v", err)
-	}
-	return nil
-}
-
-func (sm *SerialManager) Stop() {
-	close(sm.stopChan)
-	sm.wg.Wait()
-}
 
 func startConsoleInput(serialMgr *SerialManager) {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -87,10 +26,45 @@ func startConsoleInput(serialMgr *SerialManager) {
 	}()
 }
 
-var (
-	serialNumber = flag.String("serial", "", "Serial number of the WM1110 board")
-	portName     = flag.String("port", "", "Name of the serial port to connect to")
+const (
+	SENSOR_BACKLOG_SIZE = 10
 )
+
+var (
+	debugFlag     = flag.Bool("debug", false, "Enable debug mode")
+	serialNumber  = flag.String("serial", "", "Serial number of the WM1110 board")
+	portName      = flag.String("port", "", "Name of the serial port to connect to")
+	sensorBacklog = make([]string, 0)
+)
+
+func addToSensorBacklog(sd SensorData) {
+	if len(sensorBacklog) >= SENSOR_BACKLOG_SIZE {
+		sensorBacklog = sensorBacklog[1:]
+	}
+	jsonData, err := json.Marshal(sd)
+	if err != nil {
+		fmt.Printf("Failed to marshal sensor data: %v\n", err)
+		return
+	}
+	sensorBacklog = append(sensorBacklog, string(jsonData))
+}
+
+func addFakeData() {
+	sd := SensorData{
+		Humidity: &HumidityData{
+			Humidity:    rand.Float64()*50 + 50,
+			Temperature: rand.Float64()*10 + 20,
+		},
+		Accelerometer: &AccelerometerData{
+			X:                rand.Float64()*2 - 1,
+			Y:                rand.Float64()*2 - 1,
+			Z:                rand.Float64()*2 - 1,
+			PeakAcceleration: rand.Float64()*10 + 10,
+		},
+		BatteryLevel: rand.Float64()*20 + 80,
+	}
+	addToSensorBacklog(sd)
+}
 
 func enumeratePorts() {
 	ports, err := enumerator.GetDetailedPortsList()
@@ -138,12 +112,17 @@ func openSerialConnection(portName string) (serial.Port, error) {
 	return port, nil
 }
 
-func main() {
-	flag.Parse()
+func debugMode() {
+	for i := 0; i < SENSOR_BACKLOG_SIZE; i++ {
+		addFakeData()
+	}
+}
+
+func getSerialPort() serial.Port {
 	if *portName == "" && *serialNumber == "" {
 		fmt.Println("No serial number or port name specified, enumerating ports...")
 		enumeratePorts()
-		return
+		return nil
 	}
 
 	var port string
@@ -154,7 +133,7 @@ func main() {
 		fmt.Printf("Found WM1110 board at port %s\n", port)
 		if err != nil {
 			fmt.Printf("Failed to find WM1110 board: %v\n", err)
-			return
+			return nil
 		}
 	}
 	if *portName != "" && port == "" {
@@ -163,13 +142,13 @@ func main() {
 	}
 	if port == "" {
 		fmt.Println("No port found")
-		return
+		return nil
 	}
 
 	sPort, err := openSerialConnection(port)
 	if err != nil {
 		fmt.Printf("Failed to open serial connection: %v\n", err)
-		return
+		return nil
 	}
 	defer sPort.Close()
 
@@ -180,20 +159,38 @@ func main() {
 		StopBits: serial.OneStopBit,
 	})
 
-	fmt.Println("Successfully connected to WM1110!")
+	return sPort
+}
 
-	serialMgr := NewSerialManager(sPort)
-	serialMgr.StartReadLoop()
+func main() {
+	flag.Parse()
 
-	startConsoleInput(serialMgr)
+	if *debugFlag {
+		debugMode()
+		fmt.Printf("Debug mode enabled. Generated %d fake sensor data entries.\n", SENSOR_BACKLOG_SIZE)
+		fmt.Println("There will be no serial communication.")
+	} else {
+		sPort := getSerialPort()
+		if sPort == nil {
+			return
+		}
+		fmt.Println("Successfully connected to WM1110!")
 
-	fmt.Println("Serial communication started. Type your messages and press Enter to send.")
-	fmt.Println("Press Ctrl+C to exit.")
+		serialMgr := NewSerialManager(sPort)
+		serialMgr.StartReadLoop()
 
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
+		startConsoleInput(serialMgr)
 
-	<-sigChan
-	fmt.Println("\nShutting down...")
-	serialMgr.Stop()
+		fmt.Println("Serial communication started. Type your messages and press Enter to send.")
+		fmt.Println("Press Ctrl+C to exit.")
+
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, os.Interrupt)
+
+		<-sigChan
+		fmt.Println("\nShutting down...")
+		serialMgr.Stop()
+	}
+
+	startHttpServer()
 }
