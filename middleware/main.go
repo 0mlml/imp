@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -118,11 +119,11 @@ func debugMode() {
 	}
 }
 
-func getSerialPort() serial.Port {
+func getSerialPort() (serial.Port, error) {
 	if *portName == "" && *serialNumber == "" {
 		fmt.Println("No serial number or port name specified, enumerating ports...")
 		enumeratePorts()
-		return nil
+		return nil, fmt.Errorf("no serial number or port name specified")
 	}
 
 	var port string
@@ -133,7 +134,7 @@ func getSerialPort() serial.Port {
 		fmt.Printf("Found WM1110 board at port %s\n", port)
 		if err != nil {
 			fmt.Printf("Failed to find WM1110 board: %v\n", err)
-			return nil
+			return nil, err
 		}
 	}
 	if *portName != "" && port == "" {
@@ -142,13 +143,13 @@ func getSerialPort() serial.Port {
 	}
 	if port == "" {
 		fmt.Println("No port found")
-		return nil
+		return nil, errors.New("no port found")
 	}
 
 	sPort, err := openSerialConnection(port)
 	if err != nil {
 		fmt.Printf("Failed to open serial connection: %v\n", err)
-		return nil
+		return nil, err
 	}
 
 	sPort.SetMode(&serial.Mode{
@@ -158,7 +159,7 @@ func getSerialPort() serial.Port {
 		StopBits: serial.OneStopBit,
 	})
 
-	return sPort
+	return sPort, nil
 }
 
 func main() {
@@ -170,11 +171,11 @@ func main() {
 		fmt.Println("There will be no serial communication.")
 	} else {
 		go func() {
-			sPort := getSerialPort()
-			defer sPort.Close()
-			if sPort == nil {
-				panic("Failed to get serial port")
+			sPort, err := getSerialPort()
+			if err != nil {
+				os.Exit(1)
 			}
+			defer sPort.Close()
 			fmt.Println("Successfully connected to WM1110!")
 
 			serialMgr := NewSerialManager(sPort)
