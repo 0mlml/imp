@@ -26,11 +26,11 @@ func startHttpServer() {
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.Write([]byte("["))
 		for i := 0; i < count; i++ {
-			if i != 0 {
-				w.Write([]byte(","))
-			}
 			if len(sensorBacklog)-1-i < 0 {
 				break
+			}
+			if i != 0 {
+				w.Write([]byte(","))
 			}
 			w.Write([]byte(sensorBacklog[len(sensorBacklog)-1-i]))
 		}

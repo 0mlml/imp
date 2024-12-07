@@ -27,7 +27,7 @@ func startConsoleInput(serialMgr *SerialManager) {
 }
 
 const (
-	SENSOR_BACKLOG_SIZE = 10
+	SENSOR_BACKLOG_SIZE = 100
 )
 
 var (
