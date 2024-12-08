@@ -12,11 +12,16 @@ import {
     DERIVATIVE_THRESHOLD,
     MINIMUM_TEMPERATURE_THRESHOLD,
     MINIMUM_HUMIDITY_THRESHOLD,
+    MIN_STABLE_SAMPLES,
+    ACCELERATION_DERIVATIVE_THRESHOLD,
     API_BASE
 } from '$lib/consts';
 
 let environmentalTemperature = null;
 let environmentalHumidity = null;
+
+let previousState = false;
+let isMotionStill = true;
 
 export async function POST(event) {
     const request = event.request;
@@ -36,19 +41,11 @@ export async function POST(event) {
     const trends = analyzeTrends(tempHistory, humidityHistory);
     const thresholdsMet = checkThresholds(temperature, humidity, environmentalTemperature);
 
-    // Get previous state
-    let previousState = false;
-    try {
-        const prevData = await (await fetch(`http://localhost:8080/getlatest?count=1&offset=1`)).json();
-        previousState = prevData[0]?.inMouth || false;
-    } catch (e) {
-        previousState = false;
-    }
+    isMotionStill = determineStillness(data);
 
     const current = {temperature: temperature, humidity: humidity, environmentalTemperature: environmentalTemperature, environmentalHumidity: environmentalHumidity};
 
-    // Determine state
-    const inMouth = determineState(trends, thresholdsMet, previousState, current);
+    const inMouth = determineState(trends, thresholdsMet, current);
 
     return new Response(JSON.stringify({
         success: true,
@@ -60,6 +57,7 @@ export async function POST(event) {
             x, y, z,
             inMouth,
             trends,
+            isMotionStill,
             peak_acceleration,
             thresholdsMet
         }
@@ -130,31 +128,55 @@ function checkThresholds(temperature, humidity, envTemp) {
     };
 }
 
-function determineState(trends, thresholdsMet, previousState, current) {
-    if(current.temperature - MINIMUM_TEMPERATURE_THRESHOLD < current.environmentalTemperature || current.humidity - MINIMUM_HUMIDITY_THRESHOLD < current.environmentalHumidity){
+function determineStillness(data) {
+    let stableAccelPeriods = 0;
+    
+    for (let i = 1; i < data.length; i++) {
+        const currentAccel = data[i].accelerometer.peak_acceleration;
+        const prevAccel = data[i-1].accelerometer.peak_acceleration;
+        const accelDiff = Math.abs(currentAccel - prevAccel);
+        
+        if (accelDiff <= ACCELERATION_DERIVATIVE_THRESHOLD) {
+            stableAccelPeriods++;
+        } else {
+            stableAccelPeriods = 0;
+        }
+    }
+    
+    return (stableAccelPeriods >= MIN_STABLE_SAMPLES);
+}
+
+function determineState(trends, thresholdsMet, current) {
+    if(current.temperature - MINIMUM_TEMPERATURE_THRESHOLD < current.environmentalTemperature || current.humidity - MINIMUM_HUMIDITY_THRESHOLD < current.environmentalHumidity || isMotionStill){
+        previousState = false;
         return false;
     }
 
     // Clear decreasing trend - exit mouth state
     if (trends.decreasing) {
+        previousState = false;
         return false;
     }
 
     // Clear increasing trend - enter mouth state
     if (trends.increasing) {
+        previousState = true;
         return true;
     }
     
     // If thresholds are met, enter/maintain mouth state
     if (thresholdsMet.tempMet && thresholdsMet.humidityMet) {
+        previousState = true;
         return true;
     }
     
     // If one threshold is not met, maintain previous state
     if ((thresholdsMet.tempMet || thresholdsMet.humidityMet) && previousState) {
+        previousState = true;
         return true;
     }
     
     // Default to not in mouth
+    previousState = false;
     return false;
 }
