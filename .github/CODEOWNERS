@@ -1,0 +1,17 @@
+# Global owners
+* @0mlml @RAdu2005
+
+# Owner of backend
+/firmware/ @0mlml
+/middleware/ @0mlml
+
+# Owner of API
+/frontend/src/routes/api/ @RAdu2005
+
+# Unblock documentation
+/docs/
+README.md
+.github/img/
+
+# Owner of CODEOWNERS
+/.github/CODEOWNERS @0mlml
