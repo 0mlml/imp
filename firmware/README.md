@@ -1,0 +1,1 @@
+Derived from: https://github.com/aws-samples/wm1110-asset-tracker, an MIT licensed sample from Amazon for developing an asset tracker over the sidewalk network.

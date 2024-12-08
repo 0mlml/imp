@@ -1,0 +1,16 @@
+*
+!*/
+# repo
+!.gitignore
+!README.md
+
+# build
+!bootloader/**
+!boards/**
+!CMakeLists.txt
+!prj.conf
+!Kconfig
+
+#code
+!src/**
+!include/**
