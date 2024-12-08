@@ -32,7 +32,7 @@
 	  }
   
     fetchData();
-	  pollingInterval = setInterval(fetchData, 300);
+	  pollingInterval = setInterval(fetchData, 100);
   
 	  return () => clearInterval(pollingInterval);
 	});
@@ -44,7 +44,7 @@
   </script>
   
   <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-800">
-	<h1 class="text-4xl font-bold mb-6 text-blue-600">IMP Probe</h1>
+	<h1 class="text-4xl font-bold mb-6 text-blue-600">In-Mouth Probe</h1>
   
 	{#if dataState === DATA_STATE_DEVICE_NOT_RESPONDING || dataState === DATA_STATE_LOADING}
 	  <div class="flex items-center space-x-2">
