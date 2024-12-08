@@ -57,11 +57,11 @@
 	  </div>
   {:else}
   {#if dataState === DATA_STATE_IN_MOUTH}
-  <p class="text-lg font-medium bg-green-100 text-green-700 p-4 rounded mb-6 shadow hover:shadow-lg">
+  <p class="text-lg font-medium bg-green-100 text-green-700 p-4 rounded mb-6">
     Device is in the mouth
   </p>
 {:else if dataState === DATA_STATE_OUT_MOUTH}
-  <p class="text-lg font-medium bg-red-100 text-red-700 p-4 rounded mb-6 shadow hover:shadow-lg">
+  <p class="text-lg font-medium bg-red-100 text-red-700 p-4 rounded mb-6">
     Device is not in the mouth
   </p>
 {/if}
