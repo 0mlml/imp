@@ -113,14 +113,14 @@ function determineState(trends, thresholdsMet, previousState, current) {
         return false;
     }
 
-    // Clear increasing trend - enter mouth state
-    if (trends.increasing) {
-        return true;
-    }
-    
     // Clear decreasing trend - exit mouth state
     if (trends.decreasing) {
         return false;
+    }
+
+    // Clear increasing trend - enter mouth state
+    if (trends.increasing) {
+        return true;
     }
     
     // If thresholds are met, enter/maintain mouth state

@@ -29,7 +29,7 @@
       }
 	  }
   
-	  pollingInterval = setInterval(fetchData, 100);
+	  pollingInterval = setInterval(fetchData, 300);
   
 	  return () => clearInterval(pollingInterval);
 	});

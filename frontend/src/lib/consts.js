@@ -8,7 +8,7 @@ export const TREND_WINDOW_SIZE = 12; // Shorter window
 export const TEMP_THRESHOLD = 1.2; // Lower temperature threshold
 export const HUMIDITY_THRESHOLD = 70; // Lower humidity threshold
 export const MIN_INCREASING_SAMPLES = 5; // Fewer samples needed for trend
-export const MIN_DECREASING_SAMPLES = 6;
+export const MIN_DECREASING_SAMPLES = 4;
 export const DERIVATIVE_THRESHOLD = 0.018; 
 
 export const MINIMUM_TEMPERATURE_THRESHOLD = 0.35;
