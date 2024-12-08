@@ -1,11 +1,11 @@
 export async function GET() {
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 1000));
 
     const data = await (await fetch(`http://localhost:8080/getlatest?count=50`)).json();
 
     const responseBody = getEnvironmentalData(data);
 
-    return new Response(JSON.stringify({ success: true, body: responseBody}), {
+    return new Response(JSON.stringify({ success: true, body: responseBody }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
     });
@@ -24,6 +24,6 @@ const getEnvironmentalData = function (data) {
     }
 
     temperature = temperature / count;
-    humidity = humidity / count
+    humidity = humidity / count;
     return { environmentalTemperature: temperature, environmentalHumidity: humidity };
-}
+};
