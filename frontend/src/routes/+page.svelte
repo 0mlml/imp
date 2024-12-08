@@ -2,18 +2,28 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { DATA_STATE_LOADING, DATA_STATE_DEVICE_NOT_RESPONDING, DATA_STATE_IN_MOUTH, DATA_STATE_OUT_MOUTH} from '$lib/consts.js';
+  import { env } from '$env/dynamic/public';
 
-    let dataState = DATA_STATE_LOADING;
-	let processedData = null;
+  let dataState = $state(DATA_STATE_LOADING);
+	let processedData = $state(null);
 	let pollingInterval;
+
+  let updateEnvironment = true;
   
 	onMount(() => {
 	  async function fetchData() {
       try {
-        const response = await fetch('/api/getLatest');
+        const response = await fetch('/api/getLatest', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({updateEnvironment: updateEnvironment})
+        });
         if (response.ok) {
         processedData = (await response.json()).body;
         dataState = processedData.inMouth ? DATA_STATE_IN_MOUTH : DATA_STATE_OUT_MOUTH;
+        updateEnvironment = false;
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -21,12 +31,16 @@
       }
 	  }
   
-	  fetchData();
+    fetchData();
 	  pollingInterval = setInterval(fetchData, 300);
   
 	  return () => clearInterval(pollingInterval);
 	});
-  
+
+  function onclick(){
+    updateEnvironment = true;
+  }
+   
   </script>
   
   <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-800">
@@ -51,6 +65,7 @@
 			Device is not in the mouth
 		</p>
 	  {/if} 
+    <button {onclick}>Update Environment</button>
       <div><!-- position -->
         <p class="text-lg font-medium">X: {processedData.x}</p>
         <p class="text-lg font-medium">Y: {processedData.y}</p>
@@ -64,7 +79,7 @@
       <div> <!-- environment -->
         <p class="text-lg font-medium">eTemperature: {processedData.environmentalTemperature}</p>
         <p class="text-lg font-medium">eHumidity: {processedData.environmentalHumidity}</p>
-        <p class="text-lg font-medium">peak accel: {processedData.pa}</p>
+        <p class="text-lg font-medium">peak accel: {processedData.peak_acceleration}</p>
       </div>
 	{/if}
 
