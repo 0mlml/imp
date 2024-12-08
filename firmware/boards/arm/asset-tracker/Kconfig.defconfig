@@ -1,0 +1,9 @@
+if BOARD_ASSET-TRACKER
+
+config BOARD
+	default "asset-tracker"
+
+config BT_CTLR
+	default BT
+
+endif # BOARD_ASSET-TRACKER
