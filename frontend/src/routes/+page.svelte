@@ -79,7 +79,7 @@
       <div> <!-- environment -->
         <p class="text-lg font-medium">eTemperature: {processedData.environmentalTemperature}</p>
         <p class="text-lg font-medium">eHumidity: {processedData.environmentalHumidity}</p>
-        <p class="text-lg font-medium">peak accel: {processedData.pa}</p>
+        <p class="text-lg font-medium">peak accel: {processedData.peak_acceleration}</p>
       </div>
 	{/if}
 

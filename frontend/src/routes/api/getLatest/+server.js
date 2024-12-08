@@ -28,7 +28,7 @@ export async function POST(event) {
     const data = await (await fetch(`http://localhost:8080/getlatest?count=${TREND_WINDOW_SIZE}`)).json();
     
     const { humidity, temperature } = data[0].humidity;
-    const { x, y, z } = data[0].accelerometer;
+    const { x, y, z, peak_acceleration } = data[0].accelerometer;
 
     const tempHistory = data.map(d => d.humidity.temperature);
     const humidityHistory = data.map(d => d.humidity.humidity);
@@ -60,6 +60,7 @@ export async function POST(event) {
             x, y, z,
             inMouth,
             trends,
+            peak_acceleration,
             thresholdsMet
         }
     }), {
