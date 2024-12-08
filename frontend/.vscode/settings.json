@@ -1,0 +1,4 @@
+{
+    "eslint.validate": ["javascript", "svelte"],
+    "editor.formatOnSave": true
+}

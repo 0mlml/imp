@@ -9,7 +9,7 @@ export const TEMP_THRESHOLD = 1.2;
 export const HUMIDITY_THRESHOLD = 70;
 export const MIN_INCREASING_SAMPLES = 5;
 export const MIN_DECREASING_SAMPLES = 3;
-export const DERIVATIVE_THRESHOLD = 0.018; 
+export const DERIVATIVE_THRESHOLD = 0.018;
 
 export const MINIMUM_TEMPERATURE_THRESHOLD = 0.35;
 export const MINIMUM_HUMIDITY_THRESHOLD = 12;
