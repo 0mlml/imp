@@ -15,8 +15,16 @@ import {
     API_BASE
 } from '$lib/consts';
 
-export async function POST({ request }) {
-    const { environmentalTemperature, environmentalHumidity } = await request.json();
+let environmentalTemperature = null;
+let environmentalHumidity = null;
+
+export async function POST(event) {
+    const request = event.request;
+    const { updateEnvironment } = await request.json();
+
+    if (updateEnvironment == true){
+        await getEnvironment(event);
+    }
     const data = await (await fetch(`http://localhost:8080/getlatest?count=${TREND_WINDOW_SIZE}`)).json();
     
     const { humidity, temperature } = data[0].humidity;
@@ -58,6 +66,19 @@ export async function POST({ request }) {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
     });
+}
+
+async function getEnvironment(event) {
+    try {
+        const response = await event.fetch('/api/getEnvironment');
+        if (response.ok) {
+        const environmentData = (await response.json()).body;
+        environmentalTemperature = environmentData.environmentalTemperature;
+        environmentalHumidity = environmentData.environmentalHumidity
+        }
+      } catch (error) {
+        console.error('Error updating environment data:', error);
+      }
 }
 
 function analyzeTrends(tempHistory, humidityHistory) {

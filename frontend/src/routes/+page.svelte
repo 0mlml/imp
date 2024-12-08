@@ -8,16 +8,17 @@
 	let processedData = $state(null);
 	let pollingInterval;
 
-  let data = $props();
-  const environmentData = data.data.environmentData;
+  let updateEnvironment = true;
   
 	onMount(() => {
 	  async function fetchData() {
       try {
         const response = await fetch('/api/getLatest', {
           method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify(environmentData)
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({updateEnvironment: updateEnvironment})
         });
         if (response.ok) {
         processedData = (await response.json()).body;
@@ -29,6 +30,8 @@
       }
 	  }
   
+    fetchData();
+    updateEnvironment = false;
 	  pollingInterval = setInterval(fetchData, 300);
   
 	  return () => clearInterval(pollingInterval);
@@ -69,8 +72,8 @@
         <p class="text-lg font-medium">Humidity: {processedData.humidity}</p>
       </div>
       <div> <!-- environment -->
-        <p class="text-lg font-medium">eTemperature: {environmentData.environmentalTemperature}</p>
-        <p class="text-lg font-medium">eHumidity: {environmentData.environmentalHumidity}</p>
+        <p class="text-lg font-medium">eTemperature: {processedData.environmentalTemperature}</p>
+        <p class="text-lg font-medium">eHumidity: {processedData.environmentalHumidity}</p>
         <p class="text-lg font-medium">peak accel: {processedData.pa}</p>
       </div>
 	{/if}
