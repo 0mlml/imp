@@ -23,6 +23,7 @@
         if (response.ok) {
         processedData = (await response.json()).body;
         dataState = processedData.inMouth ? DATA_STATE_IN_MOUTH : DATA_STATE_OUT_MOUTH;
+        updateEnvironment = false;
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -31,11 +32,14 @@
 	  }
   
     fetchData();
-    updateEnvironment = false;
 	  pollingInterval = setInterval(fetchData, 300);
   
 	  return () => clearInterval(pollingInterval);
 	});
+
+  function onclick(){
+    updateEnvironment = true;
+  }
    
   </script>
   
@@ -61,6 +65,7 @@
 			Device is not in the mouth
 		</p>
 	  {/if} 
+    <button {onclick}>Update Environment</button>
       <div><!-- position -->
         <p class="text-lg font-medium">X: {processedData.x}</p>
         <p class="text-lg font-medium">Y: {processedData.y}</p>
