@@ -4,16 +4,14 @@ export const DATA_STATE_LOADING = 2;
 export const DATA_STATE_IN_MOUTH = 3;
 export const DATA_STATE_OUT_MOUTH = 4;
 
-export const THRESHOLD_TEMP_IN_MOUTH = 25;  // Temperature in °C for the mouth
-export const THRESHOLD_TEMP_DIFFERENCE = 2; // Maximum allowed difference between environmental and mouth temperature
-export const THRESHOLD_HUMIDITY_IN_MOUTH = 80; // Humidity in % for the mouth
-export const THRESHOLD_HUMIDITY_DIFFERENCE = 20; // Maximum allowed difference between environmental and mouth humidity
+export const TREND_WINDOW_SIZE = 12; // Shorter window
+export const TEMP_THRESHOLD = 1.2; // Lower temperature threshold
+export const HUMIDITY_THRESHOLD = 70; // Lower humidity threshold
+export const MIN_INCREASING_SAMPLES = 5; // Fewer samples needed for trend
+export const MIN_DECREASING_SAMPLES = 5;
+export const DERIVATIVE_THRESHOLD = 0.018; 
 
-export const THRESHOLD_STRICT_ACCEL = 0.1; // Maximum allowed movement for sync (in m/s²)
-export const THRESHOLD_ACCEL = 0.2; // Maximum allowed movement for mouth (in m/s²)
-export const THRESHOLD_STILL_PERIOD = 3000/300; // Minimum still period (in updates; milliseconds/update_rate)
-export const GRAVITY_ACCEL = 9.9; // Gravity acceleration (in m/s²)
-export const TEMP_MAX_DELTA = 3; // Maximum acceptable temperature change between readings
-export const HUM_MAX_DELTA = 7; // Maximum acceptable humidity change between readings
+export const MINIMUM_TEMPERATURE_THRESHOLD = 0.35;
+export const MINIMUM_HUMIDITY_THRESHOLD = 12;
 
 export const API_BASE = 'http://localhost:8080/api';
