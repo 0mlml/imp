@@ -26,8 +26,6 @@ IMP is built on cutting-edge hardware and software:
   - **Middleware:** Zephyr RTOS
   - **Frontend:** Built with Svelte for a blazing-fast user interface
 
----
-
 ## ⚙️ How It Works
 
 The **In Mouth Probe (IMP)** system leverages a combination of sensors, algorithms, and user input to detect its placement in or out of the mouth with precision:
@@ -56,8 +54,6 @@ The **In Mouth Probe (IMP)** system leverages a combination of sensors, algorith
 
 This combination of sensors, intelligent algorithms, and responsive design makes the IMP a robust and innovative solution to its uniquely playful challenge.
 
----
-
 ## 📊 Data Model and Functionality
 
 ### Sensors and Prediction:
@@ -73,8 +69,6 @@ This combination of sensors, intelligent algorithms, and responsive design makes
 ### Action and Display:
 - The user interface provides live sensor readings and real-time detection status:
   - **States:** "In the mouth" or "Not in the mouth"
-
----
 
 ## 🌟 Why IMP?
 
