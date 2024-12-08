@@ -21,7 +21,7 @@ static void scan_timer_cb(struct k_timer *timer_id)
 	at_event_send(EVENT_SCAN_SENSORS);
 	at_event_send(EVENT_SEND_UPLINK);
 
-    scan_timer_set_and_run(K_MSEC(300)); 
+    scan_timer_set_and_run(K_MSEC(100)); 
 
 }
 
