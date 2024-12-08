@@ -12,8 +12,6 @@ Welcome to the **In Mouth Probe (IMP)** GitHub repository! This project was deve
 
 ## 🛠️ Technical Specifications
 
-![Overview Diagram](./system-diagram.jpg)
-
 IMP is built on cutting-edge hardware and software:
 - **Hardware:**
   - Based on the [WM1110 module dev-kit](https://wiki.seeedstudio.com/wio_tracker_for_sidewalk/)
@@ -25,6 +23,10 @@ IMP is built on cutting-edge hardware and software:
 - **Software:**
   - **Middleware:** Zephyr RTOS
   - **Frontend:** Built with Svelte for a blazing-fast user interface
+
+Here's a simple diagram of the overview of the solution:
+
+<img src="./.github/img/system-diagram.jpg" alt="drawing" width="400"/>
 
 ## ⚙️ How It Works
 
@@ -52,7 +54,7 @@ The **In Mouth Probe (IMP)** system leverages a combination of sensors, algorith
 5. **Connectivity:**
    - BLE, LoRa, and AWS Sidewalk support ensure seamless data transfer and integration with external systems if needed.
 
-This combination of sensors, intelligent algorithms, and responsive design makes the IMP a robust and innovative solution to its uniquely playful challenge.
+This combination of sensors, intelligent algorithms, and responsive design makes the IMP a robust and innovative solution to this challenge.
 
 ## 📊 Data Model and Functionality
 
