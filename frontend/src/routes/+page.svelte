@@ -57,7 +57,7 @@
 	  </div>
   {:else}
   {#if dataState === DATA_STATE_IN_MOUTH}
-  <p class="text-lg font-medium bg-green-100 text-green-700 p-4 rounded shadow hover:shadow-lg">
+  <p class="text-lg font-medium bg-green-100 text-green-700 p-4 rounded mb-6 shadow hover:shadow-lg">
     Device is in the mouth
   </p>
 {:else if dataState === DATA_STATE_OUT_MOUTH}
@@ -68,7 +68,7 @@
 
 <p class="text-center mb-4">
   <button
-    class="border border-blue-200 bg-blue-50 text-blue-600 px-4 py-2 rounded"
+    class="border border-blue-200 bg-blue-50 text-blue-600 px-4 py-2 rounded shadow-md hover:bg-blue-100 hover:scale-110 hover:shadow-lg transition-transform duration-200"
     {onclick}>
     Update Environment
   </button>
