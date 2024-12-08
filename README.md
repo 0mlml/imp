@@ -36,4 +36,4 @@
   - The movement of the data is also considered
 
 ### Display:
-<img src="./.github/img/imp-ui.jpg" alt="ui screenshot" width="400"/>
+<img src="./.github/img/imp-ui.png" alt="ui screenshot" width="400"/>
