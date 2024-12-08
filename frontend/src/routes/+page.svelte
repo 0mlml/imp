@@ -74,7 +74,7 @@
   </button>
 </p>
       
-    <div class="border border-gray-300 bg-white p-4 rounded shadow-xl mb-6 w-64"> <!-- position -->
+    <div class="border border-gray-300 bg-white p-4 rounded shadow-xl mb-6 w-72"> <!-- position -->
       <h2 class="font-bold text-lg mb-2 text-center">Position</h2>
       <p class="mb-2">
         <span class="font-bold italic">X:</span> {processedData.x.toFixed(2)} m/s²
@@ -90,7 +90,7 @@
       </p>
     </div>
 
-      <div class="border border-gray-300 bg-white p-4 rounded shadow-xl mb-6 w-64"> <!-- temp and humidity -->
+      <div class="border border-gray-300 bg-white p-4 rounded shadow-xl mb-6 w-72"> <!-- temp and humidity -->
   <h2 class="font-bold text-lg mb-2 text-center">Temperature & Humidity</h2>
   <p class="mb-2">
     <span class="font-bold italic">Temperature:</span> {processedData.temperature.toFixed(2)} °C
@@ -100,7 +100,7 @@
   </p>
 </div>
 
-<div class="border border-gray-300 bg-white p-4 rounded shadow-xl mb-6 w-64"> <!-- environment -->
+<div class="border border-gray-300 bg-white p-4 rounded shadow-xl mb-6 w-72"> <!-- environment -->
   <h2 class="font-bold text-lg mb-2 text-center">Environment</h2>
   <p class="mb-2">
     <span class="font-bold italic">eTemperature:</span> {processedData.environmentalTemperature.toFixed(2)} °C
